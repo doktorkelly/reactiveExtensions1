@@ -10,13 +10,54 @@ namespace Scanner.XUTest
 {
     public class ScannerTest
     {
-        //private ILogger logger = null;
         private readonly ITestOutputHelper output;
 
         public ScannerTest(ITestOutputHelper output)
         {
             this.output = output;
         }
+
+        [Fact]
+        public void GetPagesQR_Observable_Output()
+        {
+            //Arrange
+            Rx1.Scanner scan = new Rx1.Scanner();
+            PageRequest request = new PageRequest("url", "chan1", 
+                DateTime.Today.AddDays(-2),
+                DateTime.Today.AddDays(0),
+                DateTime.Now.AddDays(-7));
+
+            //Act
+            IObservable<string> pages = Rx1.Scanner.GetPagesQR(request)
+                .Select(pageTup => pageTup?.ToString());
+            var disp = pages.Subscribe(new OutputObserver(output));
+
+            //Assert
+            Assert.NotNull(pages);
+            Assert.NotEmpty(output.ToString());
+            //Assert.Contains("OnNext:\r\nRequest: ModifAfter: 10.04.2017", output.ToString());
+        }
+
+        [Fact]
+        public void GetPagesList_Observable_List()
+        {
+            //Arrange
+            Rx1.Scanner scan = new Rx1.Scanner();
+            PageRequest request = new PageRequest("url", "chan1",
+                DateTime.Today.AddDays(-2),
+                DateTime.Today.AddDays(0),
+                DateTime.Now.AddDays(-7));
+
+            //Act
+            IEnumerable<PageQR> pages = Rx1.Scanner.GetPagesList(request);
+
+            //Assert
+            output.WriteLine(ToString(pages));
+            Assert.NotNull(pages);
+            Assert.NotEmpty(pages);
+        }
+
+        #region obsolete tests
 
         [Fact]
         public void DoScan_x_y()
@@ -89,45 +130,7 @@ namespace Scanner.XUTest
             Assert.NotNull(result);
         }
 
-        [Fact]
-        public void GetPagesQR_Observable_Output()
-        {
-            //Arrange
-            Rx1.Scanner scan = new Rx1.Scanner();
-            PageRequest request = new PageRequest("url", "chan1", 
-                DateTime.Today.AddDays(-2),
-                DateTime.Today.AddDays(0),
-                DateTime.Now.AddDays(-7));
-
-            //Act
-            IObservable<string> pages = Rx1.Scanner.GetPagesQR(request)
-                .Select(pageTup => pageTup?.ToString());
-            var disp = pages.Subscribe(new OutputObserver(output));
-
-            //Assert
-            Assert.NotNull(pages);
-            Assert.NotEmpty(output.ToString());
-            //Assert.Contains("OnNext:\r\nRequest: ModifAfter: 10.04.2017", output.ToString());
-        }
-
-        [Fact]
-        public void GetPagesList_Observable_List()
-        {
-            //Arrange
-            Rx1.Scanner scan = new Rx1.Scanner();
-            PageRequest request = new PageRequest("url", "chan1",
-                DateTime.Today.AddDays(-2),
-                DateTime.Today.AddDays(0),
-                DateTime.Now.AddDays(-7));
-
-            //Act
-            IEnumerable<PageQR> pages = Rx1.Scanner.GetPagesList(request);
-
-            //Assert
-            output.WriteLine(ToString(pages));
-            Assert.NotNull(pages);
-            Assert.NotEmpty(pages);
-        }
+        #endregion
 
         #region helper
 

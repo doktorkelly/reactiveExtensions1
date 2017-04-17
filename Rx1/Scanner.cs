@@ -32,6 +32,29 @@ namespace Rx1
             return page;
         }
 
+        public static IEnumerable<PageRequest> GetPagesAndWriteToFiles(PageRequest request, int maxPages = 100)
+        {
+            //TODO
+            //a) write in RX Operator:
+            IEnumerable<PageRequest> requests = GetPagesQR(request, maxPages)
+                .Select(page => WriteToFile(page))
+                .ToEnumerable();
+            return requests;
+
+            //b) write in Observer:
+            //IObservable<PageQR> pages = GetPagesQR(request, maxPages);
+            //IDisposable sub = pages.Subscribe(new PageWritingObserver());
+            //IEnumerable<PageRequest> requests = pages
+            //    .Select(page => page.Request)
+            //    .ToEnumerable();
+            //return requests;
+        }
+
+        private static PageRequest WriteToFile(PageQR page)
+        {
+            //TODO
+            return page.Request;
+        }
 
         #region obsolete methods
 
